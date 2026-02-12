@@ -96,7 +96,7 @@ p <- ggtree(tree, layout = "rectangular", size = 0.8) %<+% tip_metadata +
 
 # Save image
 ggsave(
-  filename = "Figure 4. Hierarchical clustering of coronaviruses spike gene based on relative synonymous codon usage profiles.tif",
+  filename = "Fig 4. Hierarchical clustering of coronaviruses spike gene based on relative synonymous codon usage profiles.tif",
   plot = p,
   width = 12,
   height = 8,

@@ -56,7 +56,7 @@ p_coa <- ggplot(ind_coords, aes(x = Dim1, y = Dim2, color = Genus)) +
 
 # Save figure
 ggsave(
-  filename = "Figure 3. Two-dimensional correspondence analysis (CA) of relative synonymous codon usage (RSCU) values across coronavirus genomes.tif",
+  filename = "Fig 3. Two-dimensional correspondence analysis (CA) of relative synonymous codon usage (RSCU) values across coronavirus genomes.tif",
   plot = p_coa,
   width = 10,
   height = 7,

@@ -58,7 +58,7 @@ p <- ggplot() +
 
 # Save image
 ggsave(
-  filename = "Figure 6. ENC-GC3s plot of coronavirus genomes.tif",
+  filename = "Fig 6. ENC-GC3s plot of coronavirus genomes.tif",
   plot = p,
   width = 12,
   height = 6,

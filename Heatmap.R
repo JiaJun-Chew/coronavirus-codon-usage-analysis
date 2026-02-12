@@ -59,7 +59,7 @@ heatmap_plot <- pheatmap(
 
 # Save image
 ggsave(
-  filename = "Figure 5. Heatmap of relative synonymous codon usage values across coronavirus genomes.tif",
+  filename = "Fig 5. Heatmap of relative synonymous codon usage values across coronavirus genomes.tif",
   plot = heatmap_plot,
   width = 14,
   height = 8,

@@ -19,4 +19,4 @@ This repository contains R scripts used to analyze codon usage bias in coronavir
 Scripts can be run independently to reproduce figures and analyses presented in the manuscript.
 
 ## Citation
-If you use this code, please cite the associated manuscript submitted to *Virus Evolution*.
+If you use this code, please cite the associated manuscript submitted to *PLOS ONE*.

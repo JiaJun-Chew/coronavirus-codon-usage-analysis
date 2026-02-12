@@ -15,33 +15,33 @@ data <- read_excel("C:/Users/User/OneDrive/Documents/CUB_Frequency.xlsx") %>%
   )
 
 # Kruskal-Wallis for each metric by Genus
-kruskal_genus <- map_dfr(c("ENC", "CAI", "GC3"), ~{
+kruskal_genus <- map_dfr(c("ENC", "CAI", "GC3s"), ~{
   kruskal.test(as.formula(paste(.x, "~ Genus")), data = data) %>%
     broom::tidy() %>%
     mutate(Metric = .x)
 })
 
 # Dunn's post-hoc for each metric by Genus
-dunn_genus <- map_dfr(c("ENC", "CAI", "GC3"), ~{
+dunn_genus <- map_dfr(c("ENC", "CAI", "GC3s"), ~{
   dunn_test(data, as.formula(paste(.x, "~ Genus")), p.adjust.method = "bonferroni") %>%
     mutate(Metric = .x)
 })
 
 # Kruskal-Wallis for each metric by Host
-kruskal_host <- map_dfr(c("ENC", "CAI", "GC3"), ~{
+kruskal_host <- map_dfr(c("ENC", "CAI", "GC3s"), ~{
   kruskal.test(as.formula(paste(.x, "~ Host")), data = data) %>%
     broom::tidy() %>%
     mutate(Metric = .x)
 })
 
 # Dunn's post-hoc for each metric by Host
-dunn_host <- map_dfr(c("ENC", "CAI", "GC3"), ~{
+dunn_host <- map_dfr(c("ENC", "CAI", "GC3s"), ~{
   dunn_test(data, as.formula(paste(.x, "~ Host")), p.adjust.method = "bonferroni") %>%
     mutate(Metric = .x)
 })
 
 genus_plot <- data %>%
-  pivot_longer(cols = c(ENC, CAI, GC3), names_to = "Metric", values_to = "Value") %>%
+  pivot_longer(cols = c(ENC, CAI, GC3s), names_to = "Metric", values_to = "Value") %>%
   ggplot(aes(x = Genus, y = Value, fill = Genus)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, color = "black", lwd = 0.5) +
   geom_jitter(width = 0.2, size = 2, alpha = 0.7, shape = 21, color = "black") +
@@ -63,7 +63,7 @@ genus_plot <- data %>%
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.15)))
 
 host_plot <- data %>%
-  pivot_longer(cols = c(ENC, CAI, GC3), names_to = "Metric", values_to = "Value") %>%
+  pivot_longer(cols = c(ENC, CAI, GC3s), names_to = "Metric", values_to = "Value") %>%
   ggplot(aes(x = Host, y = Value)) +
   # Neutral boxplots for cleaner Host comparison
   geom_boxplot(fill = "grey90", color = "black", lwd = 0.5, outlier.shape = NA, alpha = 0.7) +
@@ -90,7 +90,7 @@ host_plot <- data %>%
 
 # Save refined host plot
 ggsave(
-  filename = "Figure 1. Boxplots of codon usage bias across coronavirus genera.tif",
+  filename = "Fig 1. Distribution of codon usage bias across coronavirus genera.tif",
   plot = genus_plot,
   width = 14,
   height = 7,
@@ -102,7 +102,7 @@ ggsave(
 )
 
 ggsave(
-  filename = "Figure 2. Comparison of codon usage bias metrics across coronavirus host species.tif",
+  filename = "Fig 2. Comparison of codon usage bias metrics across coronavirus host species.tif",
   plot = host_plot,
   width = 14,
   height = 8,

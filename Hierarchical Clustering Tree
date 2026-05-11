@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 # Load data
-data <- read_excel("D:/Degree (MMU)/Manuscript/Submission/S1 Table.xlsx")
+data <- read_excel("D:/Manuscript/Submission/S1 Table.xlsx")
 
 data <- data %>%
   mutate(

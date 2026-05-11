@@ -1,0 +1,138 @@
+# Load libraries
+library(tidyverse)
+library(readxl)
+library(rstatix)
+library(ggpubr)
+library(ggsci)
+library(ggthemes)
+library(broom)
+library(ggh4x) 
+
+# Load data
+data <- read_excel("D:/Degree (MMU)/Manuscript/Submission/S1 Table.xlsx")
+
+# Check column names
+colnames(data)
+
+# Clean & format data
+data <- data %>%
+  mutate(
+    Host_Group = factor(Host_Group,
+                        levels = c("Human", "Bat", "Rodent/ Insectivore", "Aves", "Other mammals")),
+    Genus = factor(Genus)
+  )
+
+# Function for clean p-values
+format_p <- function(p) {
+  ifelse(p < 0.001, "<0.001", sprintf("%.6f", p))
+}
+
+# KRUSKAL-WALLIS TEST
+kruskal_host <- map_dfr(c("ENC", "CAI", "GC3s"), ~{
+  kruskal.test(as.formula(paste(.x, "~ Host_Group")), data = data) %>%
+    tidy() %>%
+    mutate(
+      Metric = .x,
+      p_label = format_p(p.value)
+    )
+})
+
+print(kruskal_host)
+
+# DUNN TEST
+dunn_host <- map_dfr(c("ENC", "CAI", "GC3s"), ~{
+  dunn_test(data, as.formula(paste(.x, "~ Host_Group")),
+            p.adjust.method = "bonferroni") %>%
+    mutate(
+      Metric = .x,
+      p_label = format_p(p.adj)
+    )
+})
+
+write.csv(dunn_host, "Dunn_HostGroup_results.csv", row.names = FALSE)
+
+# SUMMARY STATISTICS
+summary_stats <- data %>%
+  group_by(Host_Group) %>%
+  summarise(
+    n = n(),
+    ENC_mean = mean(ENC, na.rm = TRUE),
+    ENC_median = median(ENC, na.rm = TRUE),
+    CAI_mean = mean(CAI, na.rm = TRUE),
+    CAI_median = median(CAI, na.rm = TRUE),
+    GC3s_mean = mean(GC3s, na.rm = TRUE),
+    GC3s_median = median(GC3s, na.rm = TRUE)
+  )
+
+write.csv(summary_stats, "Summary_HostGroup.csv", row.names = FALSE)
+
+# SUMMARY STATISTICS 
+summary_stats_host <- data %>%
+  pivot_longer(cols = c(ENC, CAI, GC3s),
+               names_to = "Metric",
+               values_to = "Value") %>%
+  group_by(Host_Group, Metric) %>%
+  summarise(
+    n = n(),
+    Min = round(min(Value, na.rm = TRUE), 3),
+    Q1 = round(quantile(Value, 0.25, na.rm = TRUE), 3),
+    Median = round(median(Value, na.rm = TRUE), 3),
+    Mean = round(mean(Value, na.rm = TRUE), 3),
+    Q3 = round(quantile(Value, 0.75, na.rm = TRUE), 3),
+    Max = round(max(Value, na.rm = TRUE), 3),
+    .groups = "drop"
+  )
+
+write.csv(summary_stats_host,
+          "Summary_HostGroup_detailed.csv",
+          row.names = FALSE)
+
+# HOST GROUP PLOT
+host_plot <- data %>%
+  pivot_longer(cols = c(ENC, CAI, GC3s),
+               names_to = "Metric",
+               values_to = "Value") %>%
+  ggplot(aes(x = Host_Group, y = Value)) +
+  geom_boxplot(fill = "grey90", color = "black", outlier.shape = NA) +
+  geom_jitter(aes(color = Genus),
+              width = 0.2, size = 2.5, alpha = 0.8) +
+  facet_wrap(~Metric, scales = "free_y", ncol = 3) +
+  scale_color_npg() +
+  stat_compare_means(method = "kruskal.test",
+                     label = "p.format",
+                     size = 4) +
+  labs(
+    x = "Host Group",
+    y = "Metric Value",
+    color = "Genus"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
+    strip.text = element_text(face = "bold"),
+    legend.position = "right"
+  ) +
+
+  # ADJUST Y-AXIS
+  facetted_pos_scales(
+    y = list(
+      Metric == "GC3s" ~ scale_y_continuous(limits = c(0.1, 0.5)),
+      Metric == "CAI" ~ scale_y_continuous(), 
+      Metric == "ENC" ~ scale_y_continuous()  
+    )
+  )
+
+# Display result
+print(host_plot)
+
+# SAVE FIGURE
+ggsave(
+  "Fig2_HostGroup.tiff",
+  host_plot,
+  width = 14,
+  height = 8,
+  dpi = 600,
+  device = "tiff",
+  compression = "lzw",
+  bg = "white"
+)

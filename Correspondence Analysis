@@ -6,7 +6,7 @@ library(ggplot2)
 library(tidyr)
 
 # Load data
-df <- read_excel("D:/Degree (MMU)/Manuscript/Submission/S1 Table.xlsx")
+df <- read_excel("D:/Manuscript/Submission/S1 Table.xlsx")
 
 # Select RSCU columns
 rscu_cols <- grep("^[AUCG]{3}$", names(df), value = TRUE)
